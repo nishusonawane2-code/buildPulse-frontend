@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import leadService from "../api/leadService";
@@ -18,6 +18,24 @@ const Estimator = () => {
     quality: "STANDARD",
   });
 
+  const [useDimensions, setUseDimensions] = useState(false);
+  const [dimensions, setDimensions] = useState({ length: "", width: "" });
+
+  // Update builtUpArea when dimensions change
+  useEffect(() => {
+    if (useDimensions && dimensions.length && dimensions.width) {
+      const area = Number(dimensions.length) * Number(dimensions.width);
+      setFormData(prev => ({ ...prev, builtUpArea: area.toString() }));
+    }
+  }, [dimensions, useDimensions]);
+
+  const handleDimensionChange = (e) => {
+    const { name, value } = e.target;
+    // Only allow numeric input
+    const sanitizedValue = value.replace(/[^0-9]/g, '');
+    setDimensions({ ...dimensions, [name]: sanitizedValue });
+  };
+
   const [leadData, setLeadData] = useState({
     name: "",
     phone: "",
@@ -27,7 +45,14 @@ const Estimator = () => {
   });
 
   const handleFormChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    // Sanitize builtUpArea to only allow numbers
+    if (name === "builtUpArea") {
+      const sanitizedValue = value.replace(/[^0-9]/g, '');
+      setFormData({ ...formData, [name]: sanitizedValue });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleLeadChange = (e) => {
@@ -65,7 +90,7 @@ const Estimator = () => {
         builtUpArea: Number(formData.builtUpArea),
         floors: Number(formData.floors),
         quality: formData.quality,
-        city: formData.city === "Pune" ? "METRO" : "NON_METRO" // Simple mapping for now
+        city: formData.city === "Nashik" ? "Malegaon" : "Dhule" // Simple mapping for now
       };
 
       const estimateResult = await estimationService.createEstimate(estimatePayload);
@@ -158,25 +183,71 @@ const Estimator = () => {
                       required
                     >
                       <option value="" className="bg-slate-900">Select City</option>
-                      <option value="Pune" className="bg-slate-900">Pune (Metro Node)</option>
-                      <option value="Other" className="bg-slate-900">Other Territories</option>
+                      <option value="Nashik" className="bg-slate-900">Nashik</option>
+                      <option value="Malegaon" className="bg-slate-900">Malegaon</option>
+                      <option value="Dhule" className="bg-slate-900">Dhule</option>
                     </select>
                   </div>
 
                   <div className="space-y-2 group/field">
-                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-1 transition-colors group-focus-within/field:text-orange-500">Built-Up Area (sqft)</label>
+                    <div className="flex justify-between items-center mb-1">
+                      <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1 transition-colors group-focus-within/field:text-orange-500 leading-none">Built-Up Area (sqft)</label>
+                      <button
+                        type="button"
+                        onClick={() => setUseDimensions(!useDimensions)}
+                        className="text-[8px] font-black uppercase tracking-widest text-orange-500 hover:text-white transition-colors border border-orange-500/30 px-2 py-1 rounded-md bg-orange-500/5 hover:bg-orange-500"
+                      >
+                        {useDimensions ? "Close Fix" : "Dimensions"}
+                      </button>
+                    </div>
+
                     <div className="relative">
                       <input
-                        type="number"
+                        type="text"
+                        inputMode="numeric"
                         name="builtUpArea"
                         value={formData.builtUpArea}
                         onChange={handleFormChange}
                         placeholder="e.g. 2500"
-                        min="100"
-                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all placeholder:text-slate-700 hover:bg-white/10"
+                        readOnly={useDimensions}
+                        className={`w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all placeholder:text-slate-600 hover:bg-white/10 ${useDimensions ? 'bg-orange-500/5 border-orange-500/20 text-orange-400' : ''}`}
                         required
                       />
-                      <span className="absolute right-6 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-700 uppercase tracking-widest pointer-events-none">Dimension unit</span>
+                      {!useDimensions && (
+                        <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none hidden lg:block">
+                          <span className="text-[8px] font-black text-slate-600 uppercase tracking-[0.2em]">SqFt Unit</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Compact Dimension Helper Dropdown-style */}
+                    <div className={`transition-all duration-500 overflow-hidden bg-white/5 border border-white/10 rounded-2xl px-4 ${useDimensions ? 'mt-2 py-4 opacity-100 max-h-40' : 'mt-0 py-0 opacity-0 max-h-0 border-transparent bg-transparent'}`}>
+                      <div className="flex gap-4">
+                        <div className="flex-1 space-y-1">
+                          <label className="text-[8px] font-black uppercase tracking-widest text-slate-500 ml-1">Length (ft)</label>
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            name="length"
+                            value={dimensions.length}
+                            onChange={handleDimensionChange}
+                            placeholder="50"
+                            className="w-full bg-white/5 border border-white/5 rounded-xl px-3 py-2 text-white text-xs focus:outline-none focus:border-orange-500/50"
+                          />
+                        </div>
+                        <div className="flex-1 space-y-1">
+                          <label className="text-[8px] font-black uppercase tracking-widest text-slate-500 ml-1">Width (ft)</label>
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            name="width"
+                            value={dimensions.width}
+                            onChange={handleDimensionChange}
+                            placeholder="20"
+                            className="w-full bg-white/5 border border-white/5 rounded-xl px-3 py-2 text-white text-xs focus:outline-none focus:border-orange-500/50"
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
 
