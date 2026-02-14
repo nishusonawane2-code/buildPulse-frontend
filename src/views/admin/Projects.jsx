@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import axiosClient from '../../api/axiosClient';
 import { useAuth } from '../../context/AuthContext';
 
 const Projects = () => {
@@ -29,7 +29,7 @@ const Projects = () => {
     const fetchProjects = async () => {
         setLoading(true);
         try {
-            const response = await axios.get('http://localhost:8080/api/projects');
+            const response = await axiosClient.get('/projects');
             setProjects(response.data);
             setError(null);
         } catch (err) {
@@ -43,9 +43,7 @@ const Projects = () => {
     const handleDelete = async (id) => {
         if (!window.confirm("Are you sure you want to delete this project?")) return;
         try {
-            await axios.delete(`http://localhost:8080/api/projects/${id}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            await axiosClient.delete(`/projects/${id}`);
             fetchProjects();
         } catch (err) {
             console.error("Error deleting project:", err);
@@ -83,13 +81,9 @@ const Projects = () => {
         e.preventDefault();
         try {
             if (currentProject) {
-                await axios.put(`http://localhost:8080/api/projects/${currentProject.id}`, formData, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                await axiosClient.put(`/projects/${currentProject.id}`, formData);
             } else {
-                await axios.post('http://localhost:8080/api/projects', formData, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                await axiosClient.post('/projects', formData);
             }
             setIsModalOpen(false);
             fetchProjects();

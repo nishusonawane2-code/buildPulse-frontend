@@ -121,7 +121,7 @@
 
 
 import React, { useState } from 'react'
-import axios from 'axios'
+import axiosClient from '../api/axiosClient'
 import { toast } from 'sonner'
 import { Link, useNavigate } from 'react-router-dom'
 import Navbar from '../components/Navbar'
@@ -146,7 +146,7 @@ const ContactUs = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post("http://localhost:8080/api/inquiries", form);
+      const response = await axiosClient.post("/inquiries", form);
 
       if (response.status === 200 || response.status === 201) {
         toast.success("Thank you! Your message has been sent successfully.");

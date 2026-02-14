@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import axiosClient from "../../api/axiosClient";
 import { toast } from "sonner";
 
 import House from "../../assets/house3.png";
@@ -39,7 +39,7 @@ const HeroSection = () => {
     if (validate()) {
       setLoading(true);
       try {
-        const response = await axios.post("http://localhost:8080/api/leads", {
+        const response = await axiosClient.post("/leads", {
           ...form,
           source: "WEBSITE",
         });

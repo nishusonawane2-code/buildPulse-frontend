@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import axiosClient from "../api/axiosClient";
 import { toast } from "sonner";
 
 const ConsultPopup = ({ openModal, setOpenModal, navigate }) => {
@@ -20,7 +20,7 @@ const ConsultPopup = ({ openModal, setOpenModal, navigate }) => {
         setLoading(true);
 
         try {
-            const response = await axios.post("http://localhost:8080/api/leads", {
+            const response = await axiosClient.post("/leads", {
                 ...form,
                 source: "ESTIMATOR", // Or dynamic if needed, but fitting for floor plans
             });

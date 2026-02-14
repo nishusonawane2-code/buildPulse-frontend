@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import axiosClient from '../../api/axiosClient';
 import { useAuth } from '../../context/AuthContext';
 
 const EstimateForm = ({ estimateId, onClose }) => {
@@ -31,9 +31,7 @@ const EstimateForm = ({ estimateId, onClose }) => {
     const fetchEstimate = async () => {
         setLoading(true);
         try {
-            const response = await axios.get(`http://localhost:8080/api/estimates/${estimateId}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const response = await axiosClient.get(`/estimates/${estimateId}`);
             const data = response.data;
             setStatus(data.status);
             setNotes(data.notes || '');
@@ -100,13 +98,9 @@ const EstimateForm = ({ estimateId, onClose }) => {
 
         try {
             if (estimateId) {
-                await axios.put(`http://localhost:8080/api/estimates/${estimateId}`, payload, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                await axiosClient.put(`/estimates/${estimateId}`, payload);
             } else {
-                await axios.post('http://localhost:8080/api/estimates', payload, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                await axiosClient.post('/estimates', payload);
             }
             onClose();
         } catch (err) {
