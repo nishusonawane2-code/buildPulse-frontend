@@ -138,7 +138,7 @@ const Login = () => {
                             </div>
 
                             <a
-                                href="https://brilliant-cyndi-pulse-build-9b118f82.koyeb.app/oauth2/authorization/google"
+                                href="https://buildpulse-backend-production.up.railway.app/oauth2/authorization/google"
                                 className="w-full bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 font-bold py-3 rounded-lg transition-all flex items-center justify-center gap-3 active:scale-[0.98]"
                             >
                                 <svg className="w-4 h-4" viewBox="0 0 24 24">

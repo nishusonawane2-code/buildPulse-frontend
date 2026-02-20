@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const axiosClient = axios.create({
-  baseURL: "https://brilliant-cyndi-pulse-build-9b118f82.koyeb.app/api",
+  baseURL: "https://buildpulse-backend-production.up.railway.app/api",
   headers: {
     'Content-Type': 'application/json',
   },
